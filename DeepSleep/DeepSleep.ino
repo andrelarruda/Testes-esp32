@@ -1,5 +1,6 @@
 #include <Wire.h>                 // Must include Wire library for I2C
 #include <HardwareSerial.h>
+#include <Adafruit_NeoPixel.h>
 
 
 volatile bool causedByMotion = false;
@@ -9,10 +10,18 @@ void print_wakeup_reason();
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  15       /* Time ESP32 will go to sleep (in seconds) */
+#define LED_PIN 48
+#define NUMPIXELS 1  // Apenas 1 LED onboard
+
+// Cria o objeto NeoPixel
+Adafruit_NeoPixel pixels(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   Serial.begin(115200);
+  pixels.begin();
   Serial.println("***************-Hello!-***************");
+  pixels.setPixelColor(0, pixels.Color(28, 153, 61));
+  pixels.show();
 
   Wire.begin();
 
@@ -24,8 +33,15 @@ void setup() {
   Serial.println("Configura a ESP32 para acordar a cada " + String(TIME_TO_SLEEP) +
   " segundos");
 
+  delay(2000);
   Serial.println("Dormindo agora...");
+
+  pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+  pixels.show();
   delay(1000);
+  pixels.clear();
+  pixels.show();
+  
   esp_deep_sleep_start();
 
 
